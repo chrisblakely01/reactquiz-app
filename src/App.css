@@ -1,5 +1,5 @@
 * {
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Verdana", cursive, sans-serif;
 }
 
 body {
@@ -11,11 +11,12 @@ body {
 }
 
 .quiz-container {
-  background-color: #fff;
+  background-color: #252d4a;
   width: 450px;
   height: min-content;
   border-radius: 15px;
-  padding: 10px;
+  padding: 20px;
+  box-shadow: 10px 10px 42px 0px rgba(0, 0, 0, 0.75);
 }
 
 .quiz-score,
@@ -23,8 +24,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  height: 50px;
+  padding-left: 10px;
+  color: #fff;
+  margin-bottom: 70px;
+  margin-top: 70px;
+  font-size: 36px;
+}
+
+.question-count {
+  padding-left: 10px;
+  color: #8b95bd;
+  margin-bottom: 30px;
+}
+
+.question-count span {
+  font-size: 28px;
 }
 
 .timer {
@@ -52,18 +66,47 @@ body {
   height: 50px;
   font-size: 16px;
   color: #ffffff;
-  background-color: #545e75;
+  background-color: #252d4a;
   border-radius: 15px;
   display: flex;
   justify-content: start;
   align-items: center;
-  padding-left: 20px;
-  font-size: 30px;
+  border: 5px solid #234668;
 }
 
 .answer-item button:hover {
-  background-color: #f4e04d;
-  color: #000000;
+  background-color: #555e7d;
+  cursor: pointer;
+}
+
+.play-again-wrapper,
+.next-question-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 20px 0;
+}
+
+.play-again-wrapper button,
+.next-question-wrapper button {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  background: #63b0e8;
+  color: white;
+  border: 5px solid #0383e0;
+  padding: 5px 30px 5px 30px;
+  font-size: 25px;
+}
+
+.play-again-wrapper button:hover,
+.next-question-wrapper button:hover {
+  cursor: pointer;
+  background-color: #0a63a3;
+}
+
+.answer-item-circle {
+  font-size: 26px;
+  padding: 5px;
 }
 
 .answer-item button:focus {
@@ -72,4 +115,18 @@ body {
 
 .quiz-score {
   text-align: center;
+}
+
+.timer-wrapper {
+  background: #dedede;
+  height: 15px;
+  border-radius: 20px;
+  margin: 10px;
+}
+
+.timer-countdown-bar {
+  background: #ffad55;
+  height: 15px;
+  border-radius: 20px;
+  transition: width 0.5s ease-in-out;
 }
