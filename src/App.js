@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { faCircle, faCheckCircle, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const App = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [revealAnswers, setRevealAnswers] = useState(false);
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(3);
@@ -31,10 +33,10 @@ const App = () => {
   ]);
 
   useEffect(() => {
-    startTimer();
+    updateTimer();
   }, [timer]);
 
-  const startTimer = () => {
+  const updateTimer = () => {
     if (!revealAnswers && timer > 0) {
       setTimeout(() => setTimer(timer - 1), 1000);
     } else {
@@ -42,48 +44,75 @@ const App = () => {
     }
   };
 
-  const handleAnswerClick = (selectedAnswer, index) => {
-    setSelectedAnswer(index)
-    if (selectedAnswer === questions[currentQuestion].answer) {
+  const handleNextQuestionClick = () => {
+    setRevealAnswers(false);
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setTimer(15);
+  };
+
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setScore(0);
+  };
+
+  // do the simple stuff first. If the answers are revealed we don't want to do anything with the
+  const handleAnswerClick = (selectedAnswer, answer) => {
+    if (revealAnswers) {
+      return;
+    }
+
+    setSelectedAnswer(answer);
+    if (selectedAnswer === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
     }
     setRevealAnswers(true);
   };
 
-  const handleNextQuestionClick = () => {
-    setRevealAnswers(false);
-    setCurrentQuestion(currentQuestion + 1);
-    setTimer(15);
-  };
+  const AnswerButton = ({ answerOption, answer }) => {
+    // check if this is the correct answer
+    const isCorrectAnswer =
+      answerOption === questions[currentQuestionIndex].answer;
+    const isSelectedAnswer = answer === selectedAnswer;
 
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setScore(0);
+    // if this button is the correct answer, set the background to green
+    // if this button is selected but not the correct answer, set background to red
+    let backgroundColor;
+    if (isCorrectAnswer) {
+      backgroundColor = "green";
+    } else if (isSelectedAnswer) {
+      backgroundColor = "red";
+    } else {
+      backgroundColor = "black";
+    }
+
+    // set the background color, but only show correct/incorrect answers if the player clicked a button or if time runs out
+    // this is indicated by the "revealAnswers" flag being "true"
+    return (
+      <button
+        style={{ backgroundColor: revealAnswers && backgroundColor }}
+        onClick={() => handleAnswerClick(answerOption, answer)}
+      >
+        <FontAwesomeIcon icon={faCircle} /> {answerOption}
+      </button>
+    );
   };
 
   return (
     <div class="quiz-container">
-      {currentQuestion < questions.length ? (
+      {currentQuestionIndex < questions.length ? (
         <>
+          <div class="timer"> {timer}</div>
           <div class="question">
-            {timer} {questions[currentQuestion].questionText}
+            {questions[currentQuestionIndex].questionText}
           </div>
           <div class="answer-list">
-            {questions[currentQuestion].answerOptions.map(
+            {questions[currentQuestionIndex].answerOptions.map(
               (answerOption, index) => (
                 <div class="answer-item">
-                  <button
-                    style={{
-                      backgroundColor:
-                        revealAnswers &&
-                        (answerOption === questions[currentQuestion].answer
-                          ? "green"
-                          : (index === selectedAnswer && "red"))
-                    }}
-                    onClick={() => handleAnswerClick(answerOption, index)}
-                  >
-                    {answerOption}
-                  </button>
+                  <AnswerButton
+                    answerOption={answerOption}
+                    answer={questions[currentQuestionIndex].answer}
+                  />
                 </div>
               )
             )}

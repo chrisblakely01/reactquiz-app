@@ -27,6 +27,12 @@ body {
   height: 50px;
 }
 
+.timer {
+  display: flex;
+  justify-content: center;
+  font-size: 48px;
+}
+
 .answer-list {
   display: flex;
   justify-content: space-evenly;
@@ -41,16 +47,20 @@ body {
   box-sizing: border-box;
 }
 
-.play-again-button,
 .answer-item button {
   width: 100%;
   height: 50px;
   font-size: 16px;
   color: #ffffff;
   background-color: #545e75;
+  border-radius: 15px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding-left: 20px;
+  font-size: 30px;
 }
 
-.play-again-button:hover,
 .answer-item button:hover {
   background-color: #f4e04d;
   color: #000000;
@@ -58,7 +68,7 @@ body {
 
 .answer-item button:focus {
   outline: none;
-} 
+}
 
 .quiz-score {
   text-align: center;
