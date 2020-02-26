@@ -8,10 +8,11 @@ import { faCircle as faCircleRegular } from "@fortawesome/free-regular-svg-icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const App = () => {
+  const TIMER_START_VALUE = 15;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [revealAnswers, setRevealAnswers] = useState(false);
   const [score, setScore] = useState(0);
-  const [timer, setTimer] = useState(15);
+  const [timer, setTimer] = useState(TIMER_START_VALUE);
   const [selectedAnswer, setSelectedAnswer] = useState();
   const [questions] = useState([
     {
@@ -46,6 +47,8 @@ const App = () => {
     }
   ]);
 
+  // when `timer` changes this will call this effect and trigger the countdown
+  // could possibly write `updateTimer` as a simple loop but good to teach the useEffect hook
   useEffect(() => {
     updateTimer();
   }, [timer]);
@@ -64,16 +67,16 @@ const App = () => {
   const handleNextQuestionClick = () => {
     setRevealAnswers(false);
     setCurrentQuestionIndex(currentQuestionIndex + 1);
-    setTimer(15);
+    setTimer(TIMER_START_VALUE);
   };
 
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
     setScore(0);
-    setTimer(15);
+    setTimer(TIMER_START_VALUE);
   };
 
-  // do the simple stuff first. If the answers are revealed we don't want to do anything with the
+  // do the simple stuff first. If the answers are revealed we don't want to do anything with the button click
   const handleAnswerClick = selectedAnswer => {
     if (revealAnswers) {
       return;
@@ -85,84 +88,91 @@ const App = () => {
     setRevealAnswers(true);
   };
 
-  const AnswerButton = ({ answerOption }) => {
-    // check if this is the correct answer
-    const isCorrectAnswer = answerOption === currentQuestion.answer;
-    const isSelectedAnswer = answerOption === selectedAnswer;
-
-    // if this button is the correct answer, set the background to green
-    // if this button is selected but not the correct answer, set background to red
-    // TODO move to classes
-    let backgroundColor;
-    let icon;
-    if (isCorrectAnswer) {
-      backgroundColor = "#2f922f";
-      icon = faCheckCircle;
-    } else if (isSelectedAnswer) {
-      backgroundColor = "#ff3333";
-      icon = faTimesCircle;
-    } else {
-      icon = faCircleRegular;
-    }
-
-    // set the background color, but only show correct/incorrect answers if the player clicked a button or if time runs out
-    // this is indicated by the "revealAnswers" flag being "true"
-    return (
-      <button
-        style={{ backgroundColor: revealAnswers && backgroundColor }}
-        onClick={() => handleAnswerClick(answerOption)}
-      >
-        <FontAwesomeIcon
-          className="answer-item-circle"
-          icon={revealAnswers ? icon : faCircleRegular}
-        />
-        {answerOption}
-      </button>
-    );
-  };
-
   return (
-    <div class="quiz-container">
+    <div className="quiz-wrapper">
       {currentQuestionIndex < questions.length ? (
         <>
           <div className="question-count">
             <span>Question {currentQuestionIndex + 1}</span>/{questions.length}
           </div>
-          <div class="timer-wrapper">
+          <div className="timer-wrapper">
             <div
-              class="timer-countdown-bar"
-              style={{ width: (timer / 15) * 100 + "%" }}
+              className="timer-countdown-bar"
+              style={{ width: (timer / TIMER_START_VALUE) * 100 + "%" }}
             ></div>
           </div>
-          <div class="question">{currentQuestion.questionText}?</div>
-          <div class="answer-list">
+          <div className="question">{currentQuestion.questionText}?</div>
+          <div className="answer-list">
             {currentQuestion.answerOptions.map((answerOption, index) => (
-              <div class="answer-item">
-                <AnswerButton answerOption={answerOption} />
+              <div className="answer-item" key={`answer_button_${index}`}>
+                <AnswerButton
+                  answerOption={answerOption}
+                  isCorrectAnswer={answerOption === currentQuestion.answer}
+                  isSelectedAnswer={answerOption === selectedAnswer}
+                  revealAnswers={revealAnswers}
+                  handleAnswerClick={handleAnswerClick}
+                />
               </div>
             ))}
           </div>
           {revealAnswers && (
             <div className="next-question-wrapper">
               <button onClick={handleNextQuestionClick}>
-                <span>Next </span>
+                <span>Next</span>
               </button>
             </div>
           )}
         </>
       ) : (
         <>
-          <div class="quiz-score">
+          <div className="quiz-score">
             You scored {score} out of {questions.length}
           </div>
           <div className="play-again-wrapper">
-            <button class="play-again-button" onClick={() => resetQuiz()}>
+            <button className="play-again-button" onClick={() => resetQuiz()}>
               Play Again
             </button>
           </div>
         </>
       )}
     </div>
+  );
+};
+
+/******* ANSWER BUTTON COMPONENT ********/
+const AnswerButton = ({
+  answerOption,
+  isCorrectAnswer,
+  isSelectedAnswer,
+  revealAnswers,
+  handleAnswerClick
+}) => {
+  let backgroundColor;
+  let icon;
+
+  // if this button is the correct answer, set the background to green and dispay "tick circle"
+  // if this button is selected but not the correct answer, set background to red and display "x circle"
+  // only show correct/incorrect answers if the player clicked a button or if time runs out
+  // this is indicated by the "revealAnswers" flag being "true"
+  // else, display a regular "circle"
+  if (revealAnswers && isCorrectAnswer) {
+    backgroundColor = "#2f922f";
+    icon = faCheckCircle;
+  } else if (revealAnswers && isSelectedAnswer) {
+    backgroundColor = "#ff3333";
+    icon = faTimesCircle;
+  } else {
+    icon = faCircleRegular;
+  }
+
+  return (
+    <button
+      style={{ backgroundColor: backgroundColor }}
+      onClick={() => handleAnswerClick(answerOption)}
+    >
+      <FontAwesomeIcon className="answer-item-circle" icon={icon} />
+      {answerOption}
+    </button>
   );
 };
 
